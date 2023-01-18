@@ -8,7 +8,7 @@ class Graph:
 
 
 class BPA2PGraph(Graph):
-	def __init__(n, p_r, rho_col):
+	def __init__(self,n, p_r, rho_col):
 		self.n = n
 		self.party_count = 2
 		self.p_r = p_r
@@ -139,7 +139,7 @@ class BPA2PGraph(Graph):
 
 
 class SB2PGraph(Graph):
-	def __init__(n,p_r, p_b,rho_col, rho_res):
+	def __init__(self,n,p_r, p_b,rho_col, rho_res):
 		self.n = n 
 		self.p_r = p_r
 		self.party_count = 2
@@ -238,7 +238,7 @@ class SB2PGraph(Graph):
 
 
 class BPA3PGraph(Graph):
-	def __init__(n, p_r,p_b,rho_col, rho_res):
+	def __init__(self,n, p_r,p_b,rho_col, rho_res):
 		self.n = n 
 		self.p_r = p_r
 		self.p_b = p_b 
@@ -424,7 +424,7 @@ class BPA3PGraph(Graph):
 
 
 class SB3PGraph(Graph):
-	def __init__(n,p_r, p_b,rho_col,rho_excol,rho_res):
+	def __init__(self,n,p_r, p_b,rho_col,rho_excol,rho_res):
 		self.n = n 
 		self.p_r = p_r
 		self.p_b = p_b 

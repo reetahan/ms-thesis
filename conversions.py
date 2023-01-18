@@ -5,12 +5,16 @@ import matplotlib.pyplot as plt
 import sys
 import copy
 
+def rd3(num):
+	return round(num,3)
+
 class Conversion:
-	def __init__(model,parties,conv_thresh, n, p_r, rho_col, p_b=-1,rho_excol=-1,rho_res=-1, seed_ct=30,iter_max=5):
+	def __init__(self,model,parties,conv_thresh, n, p_r, rho_col, p_b=-1,rho_excol=-1,rho_res=-1, seed_ct=30,iter_max=5):
 		self.G = self.generate_graph(model,parties,n,p_r,p_b,rho_col,rho_excol,rho_res)
 		self.party_count = parties
 		self.theta = conv_thresh
 		self.seeds = self.generate_seeds(seed_ct)
+		self.iter_max = iter_max
 
 	def generate_graph(self,model,parties,n,p_r,p_b,rho_col,rho_excol,rho_res):
 		if(model == 'BPA'):
@@ -26,10 +30,7 @@ class Conversion:
 
 
 	def generate_seeds(self,seed_ct):
-		return np.random.randint(self.seed_ct*1000,size=seed_ct)
-	
-	def rd3(num):
-		return round(num,3)
+		return np.random.randint(seed_ct*1000,size=seed_ct)
 
 	def color_two(self,node,red,blue):
 		if(node in red):
@@ -57,9 +58,9 @@ class Conversion:
 		red_orig = copy.deepcopy(red)
 		blue_orig = copy.deepcopy(blue)
 
-		for n in G.nodes:
+		for n in G.graph.nodes:
 
-			neighbors = list(G.neighbors(n))
+			neighbors = list(G.graph.neighbors(n))
 			my_color = self.color_two(n,red_orig,blue_orig)
 
 			if(my_color == 'red'):
@@ -93,8 +94,8 @@ class Conversion:
 				blue.add(n)
 
 		self.G = G 
-		self.red = red 
-		self.blue = blue 
+		self.G.red = red 
+		self.G.blue = blue 
 		self.color_map = color_map
 
 	def run_simultaneous_conversions_three(G,red,blue,green,conv_thresh, color_map):
@@ -110,9 +111,9 @@ class Conversion:
 		blue_orig = copy.deepcopy(blue)
 		green_orig = copy.deepcopy(green)
 
-		for n in G.nodes:
+		for n in G.graph.nodes:
 
-			neighbors = G.neighbors(n)
+			neighbors = G.graph.neighbors(n)
 			my_color = self.color_three(n,red,blue,green)
 			cur_color = my_color
 
@@ -155,9 +156,9 @@ class Conversion:
 				green.add(n)
 
 		self.G = G 
-		self.red = red 
-		self.blue = blue 
-		self.green = green
+		self.G.red = red 
+		self.G.blue = blue 
+		self.G.green = green
 		self.color_map = color_map
 
 	def driver_simultaneous_conversions_two(self):
@@ -171,8 +172,8 @@ class Conversion:
 			cur_reds = []
 			cur_blues = []
 
-			init_red = rd3(len(self.red)/len(self.G.nodes)*100)
-			init_blue = rd3(len(self.blue)/len(self.G.nodes)*100)
+			init_red = rd3(len(self.G.red)/len(self.G.graph.nodes)*100)
+			init_blue = rd3(len(self.G.blue)/len(self.G.graph.nodes)*100)
 
 			cur_reds.append(init_red)
 			cur_blues.append(init_blue)
@@ -182,10 +183,9 @@ class Conversion:
 			while(iters < self.iter_max):
 				self.run_simultaneous_conversions_two()
 				iters = iters + 1
-				cur_reds.append(rd3(len(self.red)/len(self.G.nodes)*100))
-				cur_blues.append(rd3(len(self.blue)/len(self.G.nodes)*100))
+				cur_reds.append(rd3(len(self.G.red)/len(self.G.graph.nodes)*100))
+				cur_blues.append(rd3(len(self.G.blue)/len(self.G.graph.nodes)*100))
 			
-			print(seed, flush=True)
 			
 			red_avg.append(cur_reds[len(cur_reds)-1])
 			blue_avg.append(cur_blues[len(cur_blues)-1])
@@ -206,9 +206,9 @@ class Conversion:
 			cur_blues = []
 			cur_greens = []
 
-			init_red = rd3(len(self.red)/len(self.G.nodes)*100)
-			init_blue = rd3(len(self.blue)/len(self.G.nodes)*100)
-			init_green = rd3(len(self.green)/len(self.G.nodes)*100)
+			init_red = rd3(len(self.G.red)/len(self.G.graph.nodes)*100)
+			init_blue = rd3(len(self.G.blue)/len(self.G.graph.nodes)*100)
+			init_green = rd3(len(self.G.green)/len(self.G.graph.nodes)*100)
 
 			cur_reds.append(init_red)
 			cur_blues.append(init_blue)
@@ -219,12 +219,11 @@ class Conversion:
 			while(iters < self.iter_max):
 				self.run_simultaneous_conversions_three()
 				iters = iters + 1
-				cur_reds.append(rd3(len(self.red)/len(self.G.nodes)*100))
-				cur_blues.append(rd3(len(self.blue)/len(self.G.nodes)*100))
-				cur_greens.append(rd3(len(self.green)/len(self.G.nodes)*100))
+				cur_reds.append(rd3(len(self.G.red)/len(self.G.graph.nodes)*100))
+				cur_blues.append(rd3(len(self.G.blue)/len(self.G.graph.nodes)*100))
+				cur_greens.append(rd3(len(self.G.green)/len(self.G.graph.nodes)*100))
 			
-			print(seed, flush=True)
-			
+
 			red_avg.append(cur_reds[len(cur_reds)-1])
 			blue_avg.append(cur_blues[len(cur_blues)-1])
 			green_avg.append(cur_greens[len(cur_greens)-1])

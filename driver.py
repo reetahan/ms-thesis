@@ -19,8 +19,14 @@ def main():
 	iter_max = 5
 
 	for question in info:
-		exp = Experiment(model='BPA',party_count=2,fname_prefix='2p_BPA_results/2P_BPA_simultaneous',test_variable_name=question,
-			test_variable_range=info[question]['vals'], plot_xlabel=info[question]['xlabel'], constants=other_info, plot_ylabel=y_lab,
+
+		exp_consts = {}
+		for q in other_info:
+			if(q != question):
+				exp_consts[q] = other_info[q]
+
+		exp = Experiment(model='BPA',party_count=2,fname_prefix='2p_BPA_results/TEST_2P_BPA_simultaneous',test_variable_name=question,
+			test_variable_range=info[question]['vals'], plot_xlabel=info[question]['xlabel'], constants=exp_consts, plot_ylabel=y_lab,
 			n=N,iter_max=iter_max,seed_ct=30)
 		exp.run_experiment()
 	

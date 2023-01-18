@@ -4,10 +4,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
+def rd3(num):
+	return round(num,3)
 
 class Experiment:
 
-	def __init__(model, party_count, fname_prefix, test_variable_name, test_variable_range, plot_xlabel, constants,
+	def __init__(self,model, party_count, fname_prefix, test_variable_name, test_variable_range, plot_xlabel, constants,
 		plot_ylabel='Final Proportions of Parties', n=5000, iter_max=5, seed_ct=30):
 
 		self.model = model
@@ -21,7 +23,7 @@ class Experiment:
 		self.n = n
 		self.iter_max = iter_max
 		self.seed_ct = seed_ct
-
+	
 	def run_2bpa(self):
 
 		list_of_others = []
@@ -47,6 +49,7 @@ class Experiment:
 			if(cores_map[i] == "conv_thresh"):
 				conv_thresh_idx = i
 
+
 		for cur_tup in total_tuples:
 			print("Current Tuple: " + str(cur_tup), flush=True)
 			if(rho_col_idx != None):
@@ -58,10 +61,10 @@ class Experiment:
 				conv_thresh = cur_tup[conv_thresh_idx]
 
 			if(rho_col_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(
 					rd3(p_b)) + ", conv_thresh: " + str(rd3(conv_thresh))
 			if(conv_thresh_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + \
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + \
 										", p_b: " + \
 											str(rd3(p_b)) + ", rho_col: " + \
 												str(rd3(rho_col))
@@ -89,8 +92,8 @@ class Experiment:
 
 				print(init_str, flush=True)
 
-				conv = Conversion(model="BPA", parties=2, conv_thresh=self.conv_thresh,
-					n=self.n, p_r=self.p_r, rho_col=self.rho_col, seed_ct=self.seed_ct, iter_max=self.iter_max)
+				conv = Conversion(model="BPA", parties=2, conv_thresh=conv_thresh,
+					n=self.n, p_r=p_r, rho_col=rho_col, seed_ct=self.seed_ct, iter_max=self.iter_max)
 				red_res, blue_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)
 				blue_p.append(blue_res)
@@ -173,11 +176,11 @@ class Experiment:
 
 
 			if(rho_col_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh))  
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh))  
 			if(rho_res_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", rho_col: " + str(rd3(rho_col))  + ", conv_thresh: " + str(rd3(conv_thresh)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", rho_col: " + str(rd3(rho_col))  + ", conv_thresh: " + str(rd3(conv_thresh)) 
 			if(conv_thresh_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", rho_col: " + str(rd3(rho_col)) + ", rho_res: " + str(rd3(rho_res)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", rho_col: " + str(rd3(rho_col)) + ", rho_res: " + str(rd3(rho_res)) 
 			
 			init_diffs = []
 			red_p = []
@@ -203,7 +206,7 @@ class Experiment:
 				print(init_str, flush=True)
 
 				conv = Conversion(model="SB",parties=2,conv_thresh=self.conv_thresh, 
-					n=self.n, p_r=self.p_r, rho_col=self.rho_col, rho_res = self.rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
+					n=self.n, p_r=p_r, rho_col=rho_col, rho_res = rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
 				red_res, blue_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)
 				blue_p.append(blue_res)
@@ -253,11 +256,11 @@ class Experiment:
 				conv_thresh = cur_tup[conv_thresh_idx]
 
 			if(rho_col_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
 			if(rho_res_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
 			if(conv_thresh_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col)) + ", rho_res: " + str(rd3(rho_res)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col)) + ", rho_res: " + str(rd3(rho_res)) 
 			
 			init_diffs = []
 			red_p = []
@@ -284,7 +287,7 @@ class Experiment:
 				print(init_str, flush=True)
 
 				conv = Conversion(model="BPA",parties=3,conv_thresh=self.conv_thresh, 
-					n=self.n, p_r=self.p_r, rho_col=self.rho_col,rho_res=self.rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
+					n=self.n, p_r=p_r, rho_col=rho_col,rho_res=rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
 				red_res, blue_res, green_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)
 				blue_p.append(blue_res)
@@ -341,13 +344,13 @@ class Experiment:
 
 
 			if(rho_col_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))+ ", rho_excol: " + str(rd3(rho_excol))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))+ ", rho_excol: " + str(rd3(rho_excol))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
 			if(rho_excol_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))+ ", rho_col: " + str(rd3(rho_excol))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))+ ", rho_col: " + str(rd3(rho_excol))  + ", rho_res: " + str(rd3(rho_res)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
 			if(rho_res_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col))+ ", rho_excol: " + str(rd3(rho_excol)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col))+ ", rho_excol: " + str(rd3(rho_excol)) + ", conv_thresh: " + str(rd3(conv_thresh)) 
 			if(conv_thresh_idx == None):
-				title_str = "N: " + str(n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col))+ ", rho_excol: " + str(rd3(rho_excol)) + ", rho_res: " + str(rd3(rho_res)) 
+				title_str = "N: " + str(self.n) + ", p_r: " + str(rd3(p_r)) + ", p_b: " + str(rd3(p_b)) + ", p_g: " + str(rd3(p_g))  + ", rho_col: " + str(rd3(rho_col))+ ", rho_excol: " + str(rd3(rho_excol)) + ", rho_res: " + str(rd3(rho_res)) 
 			
 			init_diffs = []
 			red_p = []
@@ -379,8 +382,8 @@ class Experiment:
 				print(init_str, flush=True)
 
 				conv = Conversion(model="SB",parties=3,conv_thresh=self.conv_thresh, 
-					n=self.n, p_r=self.p_r, rho_col=self.rho_col, rho_excol=self.rho_excol,
-					rho_res=self.rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
+					n=self.n, p_r=p_r, rho_col=rho_col, rho_excol=rho_excol,
+					rho_res=rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
 				red_res, blue_res, green_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)
 				blue_p.append(blue_res)
