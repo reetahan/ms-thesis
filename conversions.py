@@ -98,7 +98,7 @@ class Conversion:
 		self.G.blue = blue 
 		self.color_map = color_map
 
-	def run_simultaneous_conversions_three(G,red,blue,green,conv_thresh, color_map):
+	def run_simultaneous_conversions_three(self):
 		G = self.G 
 		red = G.red
 		blue = G.blue 

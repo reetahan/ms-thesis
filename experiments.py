@@ -205,7 +205,7 @@ class Experiment:
 
 				print(init_str, flush=True)
 
-				conv = Conversion(model="SB",parties=2,conv_thresh=self.conv_thresh, 
+				conv = Conversion(model="SB",parties=2,conv_thresh=conv_thresh, 
 					n=self.n, p_r=p_r, rho_col=rho_col, rho_res = rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
 				red_res, blue_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)
@@ -286,8 +286,8 @@ class Experiment:
 
 				print(init_str, flush=True)
 
-				conv = Conversion(model="BPA",parties=3,conv_thresh=self.conv_thresh, 
-					n=self.n, p_r=p_r, rho_col=rho_col,rho_res=rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
+				conv = Conversion(model="BPA",parties=3,conv_thresh=conv_thresh, 
+					n=self.n, p_r=p_r,p_b=p_b, rho_col=rho_col,rho_res=rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
 				red_res, blue_res, green_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)
 				blue_p.append(blue_res)
@@ -381,8 +381,8 @@ class Experiment:
 
 				print(init_str, flush=True)
 
-				conv = Conversion(model="SB",parties=3,conv_thresh=self.conv_thresh, 
-					n=self.n, p_r=p_r, rho_col=rho_col, rho_excol=rho_excol,
+				conv = Conversion(model="SB",parties=3,conv_thresh=conv_thresh, 
+					n=self.n, p_r=p_r, p_b=p_b, rho_col=rho_col, rho_excol=rho_excol,
 					rho_res=rho_res,seed_ct=self.seed_ct,iter_max=self.iter_max)
 				red_res, blue_res, green_res = conv.run_simultaneous_conversions()
 				red_p.append(red_res)

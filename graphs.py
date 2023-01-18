@@ -139,13 +139,15 @@ class BPA2PGraph(Graph):
 
 
 class SB2PGraph(Graph):
-	def __init__(self,n,p_r, p_b,rho_col, rho_res):
+	def __init__(self,n,p_r,rho_col, rho_res):
 		self.n = n 
 		self.p_r = p_r
 		self.party_count = 2
 		self.p_b = 1.0 - self.p_r 
 		self.rho_col = rho_col
 		self.rho_res = rho_res
+
+		self.graph, self.red, self.blue, self.color_map = self.generate_graph()
 
 	def generate_graph(self):
 		n = self.n 
@@ -247,11 +249,15 @@ class BPA3PGraph(Graph):
 		self.rho_col = rho_col
 		self.rho_res = rho_res
 
+		self.graph, self.red, self.blue, self.green, self.color_map = self.generate_graph()
+
 	def generate_graph(self):
 		n = self.n 
 		p_r = self.p_r
 		p_b = self.p_b
+		p_g = self.p_g
 		rho_col = self.rho_col
+		rho_res = self.rho_res
 
 		num_red = n * p_r
 		num_blue = n * p_b
@@ -434,10 +440,13 @@ class SB3PGraph(Graph):
 		self.rho_excol = rho_excol
 		self.rho_res = rho_res
 
+		self.graph, self.red, self.blue, self.green, self.color_map = self.generate_graph()
+
 	def generate_graph(self):
 		n = self.n 
 		p_r = self.p_r
 		p_b = self.p_b
+		p_g = self.p_g
 		rho_col = self.rho_col
 		rho_excol = self.rho_excol
 		rho_res = self.rho_res
