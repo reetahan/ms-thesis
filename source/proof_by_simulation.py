@@ -3,12 +3,12 @@ from conversions import *
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-from math import factorial, floor, ceil
+from math import factorial, floor, ceil, cos, sin, acos, sqrt
 from itertools import permutations
 
 def main():
 
-	n = 10
+	n = 5
 	r = 0.6
 	p = 0.3
 	a_u = 0.5
@@ -26,7 +26,7 @@ def test_graph_generation(n,r,p,a_u):
 	distribution = []
 	for node in test.graph.nodes:
 		neighbors = test.graph.neighbors(node)
-		denominator = len(neighbors)
+		denominator = test.graph.degree[node]
 		numerator = 0
 		for neighbor in neighbors:
 			if(test.color_map[neighbor] == 'red'):
@@ -40,9 +40,11 @@ def test_graph_generation(n,r,p,a_u):
 
 def test_ccdf_generator(n, r, p, a_u):
 	result = 0
-	b_est = cubic_solve(4*p-2*p**2-2,2 + 3*p**2 - 5*p + 2*r - 2*p*r,2*p - 2*r + 2*p*r - p**2,-1*r*p)
+	b_est_roots = cubic_solve(4*p-2*p**2-2,2 + 3*p**2 - 5*p + 2*r - 2*p*r,2*p - 2*r + 2*p*r - p**2,-1*r*p)
+	b_est = [x for x in b_est_roots if x >= 0 and x <= 1][0]
 
 	for d in range(0,n):
+		print('d: ' + str(d) +' of ' + str(n))
 
 		inner_result_one_one = 0
 		inner_result_one_two = 0
@@ -53,15 +55,16 @@ def test_ccdf_generator(n, r, p, a_u):
 			inner_result_two_two = 0
 
 
-			for j in range(0, min(floor((d-2)/a_u),n-i)):
+			for j in range(1, min(floor((d-2)/a_u),n-i)):
 				inner_result_three = 0
 
-				for k in range(ceiling(j*a_u)-1,j):
+				for k in range(ceil(j*a_u)-1,j):
 					inner_result_four = 0
 					permutations = permutation_generator(n-i-j,j-k,k)
 					perm_counts = permutation_counters(permutations)
 
-					for m in range(1, factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k))):
+
+					for m in range(1, int(factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k)))):
 						inner_result_five = 1
 						cur_permutation = permutations[m]
 						cur_pc = perm_counts[m]
@@ -78,15 +81,15 @@ def test_ccdf_generator(n, r, p, a_u):
 
 				inner_result_two_one = inner_result_two_one + inner_result_three
 
-			for j in range(0, min(floor((d-1)/a_u),n-i)):
+			for j in range(1, min(floor((d-1)/a_u),n-i)):
 				inner_result_three = 0
 
-				for k in range(ceiling(j*a_u),j):
+				for k in range(ceil(j*a_u),j):
 					inner_result_four = 0
 					permutations = permutation_generator(n-i-j,j-k,k)
 					perm_counts = permutation_counters(permutations)
 
-					for m in range(1, factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k))):
+					for m in range(1, int(factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k)))):
 						inner_result_five = 1
 						cur_permutation = permutations[m]
 						cur_pc = perm_counts[m]
@@ -103,8 +106,8 @@ def test_ccdf_generator(n, r, p, a_u):
 
 				inner_result_two_two = inner_result_two_two + inner_result_three
 
-			coefficient_one = b_est/(1 - ((1-b_est)(1-p)))
-			coefficient_two = ((1-b_est)*p)/(1 - ((1-b_est)(1-p)))
+			coefficient_one = b_est/(1 - ((1-b_est)*(1-p)))
+			coefficient_two = ((1-b_est)*p)/(1 - ((1-b_est)*(1-p)))
 			inner_result_one_one = inner_result_one_one + coefficient_one*inner_result_two_one + coefficient_two*inner_result_two_two
 
 		for i in range(1,n):
@@ -114,15 +117,15 @@ def test_ccdf_generator(n, r, p, a_u):
 			inner_result_two_two = 0
 
 
-			for j in range(0, min(floor((d-1)/a_u),n-i)):
+			for j in range(1, min(floor((d-1)/a_u),n-i)):
 				inner_result_three = 0
 
-				for k in range(ceiling(j*a_u)-1,j):
+				for k in range(ceil(j*a_u)-1,j):
 					inner_result_four = 0
 					permutations = permutation_generator(n-i-j,j-k,k)
 					perm_counts = permutation_counters(permutations)
 
-					for m in range(1, factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k))):
+					for m in range(1, int(factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k)))):
 						inner_result_five = 1
 						cur_permutation = permutations[m]
 						cur_pc = perm_counts[m]
@@ -139,15 +142,15 @@ def test_ccdf_generator(n, r, p, a_u):
 
 				inner_result_two_one = inner_result_two_one + inner_result_three
 
-			for j in range(0, min(floor((d)/a_u),n-i)):
+			for j in range(1, min(floor((d)/a_u),n-i)):
 				inner_result_three = 0
 
-				for k in range(ceiling(j*a_u),j):
+				for k in range(ceil(j*a_u),j):
 					inner_result_four = 0
 					permutations = permutation_generator(n-i-j,j-k,k)
 					perm_counts = permutation_counters(permutations)
 
-					for m in range(1, factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k))):
+					for m in range(1, int(factorial(n-i)/(factorial(n-i-j)*factorial(j-k)*factorial(k)))):
 						inner_result_five = 1
 						cur_permutation = permutations[m]
 						cur_pc = perm_counts[m]
@@ -164,8 +167,8 @@ def test_ccdf_generator(n, r, p, a_u):
 
 				inner_result_two_two = inner_result_two_two + inner_result_three
 
-			coefficient_one = b_est/(1 - ((b_est)(1-p)))
-			coefficient_two = ((1-b_est)*p)/(1 - ((b_est)(1-p)))
+			coefficient_one = b_est/(1 - ((b_est)*(1-p)))
+			coefficient_two = ((1-b_est)*p)/(1 - ((b_est)*(1-p)))
 			inner_result_one_two = inner_result_one_two + coefficient_one*inner_result_two_one + coefficient_two*inner_result_two_two
 
 
@@ -184,8 +187,8 @@ def permutation_generator(N, B, R):
 		permute_str += "B"
 	for i in range(R):
 		permute_str += "R"
-	permutations = [''.join(x) for x in permutations(permute_str)]
-	return permutations
+	permutation_list = [''.join(x) for x in permutations(permute_str)]
+	return permutation_list
 
 def permutation_counters(permutations):
 	pcs = []
@@ -243,11 +246,11 @@ def cubic_solve(a, b, c, d):
 
         D = c * c - 4.0 * b * d                       # Helper Temporary Variable
         if D >= 0:
-            D = math.sqrt(D)
+            D = sqrt(D)
             x1 = (-c + D) / (2.0 * b)
             x2 = (-c - D) / (2.0 * b)
         else:
-            D = math.sqrt(-D)
+            D = sqrt(-D)
             x1 = (-c + D * 1j) / (2.0 * b)
             x2 = (-c - D * 1j) / (2.0 * b)
             
@@ -266,35 +269,35 @@ def cubic_solve(a, b, c, d):
 
     elif h <= 0:                                # All 3 roots are Real
 
-        i = math.sqrt(((g ** 2.0) / 4.0) - h)   # Helper Temporary Variable
+        i = sqrt(((g ** 2.0) / 4.0) - h)   # Helper Temporary Variable
         j = i ** (1 / 3.0)                      # Helper Temporary Variable
-        k = math.acos(-(g / (2 * i)))           # Helper Temporary Variable
+        k = acos(-(g / (2 * i)))           # Helper Temporary Variable
         L = j * -1                              # Helper Temporary Variable
-        M = math.cos(k / 3.0)                   # Helper Temporary Variable
-        N = math.sqrt(3) * math.sin(k / 3.0)    # Helper Temporary Variable
+        M = cos(k / 3.0)                   # Helper Temporary Variable
+        N = sqrt(3) * sin(k / 3.0)    # Helper Temporary Variable
         P = (b / (3.0 * a)) * -1                # Helper Temporary Variable
 
-        x1 = 2 * j * math.cos(k / 3.0) - (b / (3.0 * a))
+        x1 = 2 * j * cos(k / 3.0) - (b / (3.0 * a))
         x2 = L * (M + N) + P
         x3 = L * (M - N) + P
 
         return np.array([x1, x2, x3])           # Returning Real Roots as numpy array.
 
     elif h > 0:                                 # One Real Root and two Complex Roots
-        R = -(g / 2.0) + math.sqrt(h)           # Helper Temporary Variable
+        R = -(g / 2.0) + sqrt(h)           # Helper Temporary Variable
         if R >= 0:
             S = R ** (1 / 3.0)                  # Helper Temporary Variable
         else:
             S = (-R) ** (1 / 3.0) * -1          # Helper Temporary Variable
-        T = -(g / 2.0) - math.sqrt(h)
+        T = -(g / 2.0) - sqrt(h)
         if T >= 0:
             U = (T ** (1 / 3.0))                # Helper Temporary Variable
         else:
             U = ((-T) ** (1 / 3.0)) * -1        # Helper Temporary Variable
 
         x1 = (S + U) - (b / (3.0 * a))
-        x2 = -(S + U) / 2 - (b / (3.0 * a)) + (S - U) * math.sqrt(3) * 0.5j
-        x3 = -(S + U) / 2 - (b / (3.0 * a)) - (S - U) * math.sqrt(3) * 0.5j
+        x2 = -(S + U) / 2 - (b / (3.0 * a)) + (S - U) * sqrt(3) * 0.5j
+        x3 = -(S + U) / 2 - (b / (3.0 * a)) - (S - U) * sqrt(3) * 0.5j
 
         return np.array([x1, x2, x3])           # Returning One Real Root and two Complex Roots as numpy array.
 
