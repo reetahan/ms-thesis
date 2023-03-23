@@ -8,16 +8,27 @@ from itertools import permutations
 
 def main():
 
-	n = 5
+
 	r = 0.6
 	p = 0.3
 	a_u = 0.5
+	errors = []
 
-	empirical = test_graph_generation(n,r,p,a_u)
-	theoretical =  test_ccdf_generator(n,r,p,a_u)
+	for n in range(3,7):
 
-	print('Theoretical Probability: ' + str(theoretical))
-	print('Empirical Probability: ' + str(empirical))
+		empirical = test_graph_generation(n,r,p,a_u)
+		theoretical =  test_ccdf_generator(n,r,p,a_u)
+		error = abs(theoretical - empirical)
+
+		print('Theoretical Probability: ' + str(theoretical))
+		print('Empirical Probability: ' + str(empirical))
+		print('Absolute Difference: ' +  str(error))
+		errors.append(error)
+
+	plt.plot(n,error)
+	plt.xlabel('Number of Vertices')
+	plt.ylabel('Error')
+	plt.show()
 
 def test_graph_generation(n,r,p,a_u):
 
