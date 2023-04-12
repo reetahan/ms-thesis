@@ -8,12 +8,13 @@ class Graph:
 
 
 class BPA2PGraph(Graph):
-	def __init__(self,n, p_r, rho_col):
+	def __init__(self,n, p_r, rho_col, verbose=False):
 		self.n = n
 		self.party_count = 2
 		self.p_r = p_r
 		self.p_b = 1.0 - self.p_r
 		self.rho_col = rho_col
+		self.verbose = verbose
 
 		self.graph, self.red, self.blue, self.color_map = self.generate_graph()
 
@@ -38,6 +39,19 @@ class BPA2PGraph(Graph):
 
 
 		for i in range(2, n):
+
+			if(self.verbose):
+				for node in self.graph.nodes:
+					neighbors = self.graph.neighbors(node)
+					denominator = self.graph.degree[node]
+					numerator = 0
+					for neighbor in neighbors:
+						if(self.color_map[neighbor] == 'red'):
+							numerator += 1
+					red_frac= numerator/denominator
+					if(red_frac >=  a_u):
+						success += 1
+				result = success/n
 
 			red_ind = False
 			blue_ind = False
@@ -148,6 +162,7 @@ class SB2PGraph(Graph):
 		self.rho_res = rho_res
 
 		self.graph, self.red, self.blue, self.color_map = self.generate_graph()
+
 
 	def generate_graph(self):
 		n = self.n 

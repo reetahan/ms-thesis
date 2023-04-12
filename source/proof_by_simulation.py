@@ -12,24 +12,17 @@ def main():
 	r = 0.6
 	p = 0.3
 	a_u = 0.5
-	errors = []
+	N = 7
+	sims = 1000
 
-	for n in range(3,7):
+	empirical_res = np.mean([test_graph_generation(N,r,p,a_u) for i in range(sims)])
+	print('Empirical Result: ' + str(empirical_res))
 
-		empirical = test_graph_generation(n,r,p,a_u)
-		theoretical =  test_ccdf_generator(n,r,p,a_u)
-		error = abs(theoretical - empirical)
+	theoretical_res = theory_test(N,r,p,a_u)
+	print('Theoretical Result: ' + str(theoretical_res))
 
-		print('Theoretical Probability: ' + str(theoretical))
-		print('Empirical Probability: ' + str(empirical))
-		print('Absolute Difference: ' +  str(error))
-		errors.append(error)
 
-	plt.plot(n,error)
-	plt.xlabel('Number of Vertices')
-	plt.ylabel('Error')
-	plt.show()
-
+	
 def test_graph_generation(n,r,p,a_u):
 
 	test = BPA2PGraph(n,r,p)
@@ -48,12 +41,72 @@ def test_graph_generation(n,r,p,a_u):
 	result = success/n
 	return result
 
+def theory_test(n,r,p,a_u):
+	return np.sum([q/n * prob_q(n,r,p,a_u,q) for q in range(1,n+1)])
+
+def prob_q(n,r,p,a_u,q):
+	across_all_perms = 0
+	perms, red_cts = generate_all_permutations(n-2,['R','B'])
+	for perm_idx in range(len(perms)):
+		perm = perms[perm_idx]
+		for i in range(len(perm)):
+			perm[i] = perm[i] + str(i+1)
+		red_ct = red_cts[perm_idx]
+		odds_of_perm =  r**red_ct * (1-r)**(n-2-red_ct)
+		q_assignments = generate_all_q_assignments(q,n,perm)
+		across_all_q_asgs = 0
+		for q_asg_idx in range(len(q_assignments)):
+			possible_events = generate_event_series(q_assignments[q_asg_idx],a_u)
+			across_all_q_asgs += np.sum([events_probability(possible_event, r, p) for possible_event in possible_events])
+		across_all_perms += odds_of_perm * across_all_q_asgs
+	return across_all_perms
+
+def generate_event_series(q_asg, a_u):
+	pass
+
+def events_probability(event,r,p):
+	pass
+
+def generate_all_q_assignments(q,n,perm):
+	base = ['R0','B0']
+	l1_base = ('NQ','NQ')
+	l2_base = ('Q','Q')
+	l3_base = ('Q','NQ')
+	l4_base = ('NQ','Q')
+	l1_ =  ['Q' for i in range(q)] + ['NQ' for i in range(n-2-q)]
+	final_l1 = [list(l1_base + x) for x in set(permutations(l1_))]
+	l2_ =  ['Q' for i in range(q-2)] + ['NQ' for i in range(n-2-q+2)]
+	final_l2 = [list(l2_base + x) for x in set(permutations(l2_))]
+	l3_ =  ['Q' for i in range(q-1)] + ['NQ' for i in range(n-2-q+1)]
+	final_l3 = [list(l3_base + x) for x in set(permutations(l3_))]
+	l4_ =  ['Q' for i in range(q-1)] + ['NQ' for i in range(n-2-q+1)]
+	final_l4 = [list(l4_base + x) for x in set(permutations(l4_))]
+	final = final_l1 + final_l2 + final_l3 + final_l4
+
+	perm = base + perm
+	poss_assignments = [dict(zip(perm,q_asg)) for q_asg in final]
+
+	return poss_assignments
+
+
+def generate_all_permutations(N,colors):
+	permutes = []
+	red_cts = []
+	for red_ct in range(0,N+1):
+		cur_ls = ['R' for i in range(red_ct)] + ['B' for i in range(N-red_ct)]
+		possible_permutes = [list(x) for x in set(permutations(cur_ls))]
+		permutes += list(possible_permutes)
+		red_cts += [red_ct] * len(possible_permutes)
+	return permutes, red_cts
+
+
+
 
 def test_ccdf_generator(n, r, p, a_u):
 	result = 0
 	b_est_roots = cubic_solve(4*p-2*p**2-2,2 + 3*p**2 - 5*p + 2*r - 2*p*r,2*p - 2*r + 2*p*r - p**2,-1*r*p)
-	b_est = [x for x in b_est_roots if x >= 0 and x <= 1][0]
-
+	#b_est = [x for x in b_est_roots if x >= 0 and x <= 1][0]
+	b_est = 0.2
 	for d in range(0,n):
 		print('d: ' + str(d) +' of ' + str(n))
 
