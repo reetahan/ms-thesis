@@ -8,20 +8,27 @@ from itertools import permutations, combinations
 
 def main():
 
-	r = 0.6
-	p = 0.6
-	a_u = 0.6
-	N = 12
-	sims = 10000
+	errors = []
+	N_vals = np.arange(3,8)
+	for N in N_vals:
+		r = 0.6
+		p = 0.6
+		a_u = 0.6
+		sims = 10000
 
-	results = []
-	for i in range(sims):
-		sample = test_graph_generation(N,r,p,a_u)
-		results.append(sample)
-	empirical_res = np.mean(results)
-	print('Empirical Result: ' + str(empirical_res))
-	theoretical_res = theory_test(N,r,p,a_u)
-	print('Theoretical Result: ' + str(theoretical_res))
+		results = []
+		for i in range(sims):
+			sample = test_graph_generation(N,r,p,a_u)
+			results.append(sample)
+		empirical_res = np.mean(results)
+		print('Empirical Result: ' + str(empirical_res))
+		theoretical_res = theory_test(N,r,p,a_u)
+		print('Theoretical Result: ' + str(theoretical_res))
+		error = theoretical_res - empirical_res
+		errors.append(error)
+
+	plt.plot(N_vals,errors)
+	plt.show()
 	
 def test_graph_generation(n,r,p,a_u):
 
