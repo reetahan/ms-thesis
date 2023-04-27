@@ -26,9 +26,6 @@ def main():
 		print('Theoretical Result: ' + str(theoretical_res))
 		error = theoretical_res - empirical_res
 		errors.append(error)
-
-	plt.plot(N_vals,errors)
-	plt.show()
 	
 def test_graph_generation(n,r,p,a_u):
 
