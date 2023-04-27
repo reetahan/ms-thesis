@@ -100,14 +100,24 @@ def generate_event_series(q_asg, a_u):
 	for i in range(len(nodes)):
 		cur_possible_events = generate_event_step(cur_possible_events, q_asg, a_u, 
 			index, nodes)
+		if(len(cur_possible_events) == 0):
+			break
 
 	return cur_possible_events
 
 def generate_event_step(cur_possible_events, q_asg, a_u, index, nodes):
-	new_events = []
+	q_value = q_asg[cur_event[index][0]]
 	N = len(nodes)
+
+	new_events = []
 	for cur_event in cur_possible_events:
 		options = []
+		additional = []
+
+		red_choices = [nodes[index+1:][i] for i in range(len(nodes[index+1:])) if (nodes[index+1:][i] == 'R' and cur_event[index+1+i][1] in ['UR','UB'] )]
+		total_red_left = len(red_choices)
+		blue_choices = [nodes[index+1:][i] for i in range(len(nodes[index+1:])) if (nodes[index+1:][i] == 'B' and cur_event[index+1+i][1] in ['UR','UB'])]
+		total_blue_left = len(blue_choices)
 
 		init_color = None
 		past_color_options = None
@@ -116,17 +126,86 @@ def generate_event_step(cur_possible_events, q_asg, a_u, index, nodes):
 			past_color_options = [[node for node in nodes[:index] if node[0] == 'R'], [node for node in nodes[:index] if node[0] == 'B']]
 
 		if(init_color is None):
+			if(cur_event[index][1][0] == 'R'):
+				if(q_value == 'Q'):
+					min_add = 
+					max_add =
+
+					for pair in additional:
+						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						options.append(option)
+				else:
+					min_add = 
+					max_add =
+
+					for pair in additional:
+						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						options.append(option)
+			else:
+				if(q_value == 'Q'):
+					min_add = 
+					max_add =
+
+					for pair in additional:
+						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						options.append(option)
+				else:
+					min_add = 
+					max_add =
+
+					for pair in additional:
+						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						options.append(option)
 
 		else:
+			if(q_value == 'Q'):
+				min_add = 
+				max_add =
+
+				for pair in additional:
+					option = {'event': cur_event, 'init_color': init_color[0], 'past_color_options': past_color_options[0], \
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					options.append(option)
+
+				additional = []
+
+				min_add = 
+				max_add =
+
+				for pair in additional:
+					option = {'event': cur_event, 'init_color': init_color[1], 'past_color_options': past_color_options[1], \
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					options.append(option)
+			else:
+				min_add = 
+				max_add =
+
+				for pair in additional:
+					option = {'event': cur_event, 'init_color': init_color[0], 'past_color_options': past_color_options[0], \
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					options.append(option)
+
+				additional = []
+
+				min_add = 
+				max_add =
+
+				for pair in additional:
+					option = {'event': cur_event, 'init_color': init_color[1], 'past_color_options': past_color_options[1], \
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					options.append(option)
 
 		
 		for option in options:
-			new_events += generate_event_permutations(option['event'], option['init_color'], option['past_color_options'], 
-				option['num_red'], option['red_options'], option['num_blue'], option['blue_options'])
+			new_events += generate_event_permutations(option)
 
 	return new_events
 
-def generate_event_permutations(event,past_color, past_color_options, num_red, red_options, num_blue, blue_options):
+def generate_event_permutations(option):
 	possiblities = []
 
 	return possiblities
