@@ -8,11 +8,10 @@ from itertools import permutations
 
 def main():
 
-
-	r = 0.6
-	p = 0.3
-	a_u = 0.5
-	N = 7
+	r = 0.8
+	p = 0.8
+	a_u = 0.4
+	N = 10
 	sims = 1000
 
 	empirical_res = np.mean([test_graph_generation(N,r,p,a_u) for i in range(sims)])
@@ -20,8 +19,6 @@ def main():
 
 	theoretical_res = theory_test(N,r,p,a_u)
 	print('Theoretical Result: ' + str(theoretical_res))
-
-
 	
 def test_graph_generation(n,r,p,a_u):
 
@@ -42,11 +39,15 @@ def test_graph_generation(n,r,p,a_u):
 	return result
 
 def theory_test(n,r,p,a_u):
+	
+	perms, red_cts = generate_all_permutations(n-2,['R','B'])
+	perm_len = len(perms)
+	print('Generated permutations')
+
 	return np.sum([q/n * prob_q(n,r,p,a_u,q) for q in range(1,n+1)])
 
-def prob_q(n,r,p,a_u,q):
+def prob_q(n,r,p,a_u,q,perms,red_cts,perm_len):
 	across_all_perms = 0
-	perms, red_cts = generate_all_permutations(n-2,['R','B'])
 	for perm_idx in range(len(perms)):
 		perm = perms[perm_idx]
 		for i in range(len(perm)):
@@ -54,15 +55,83 @@ def prob_q(n,r,p,a_u,q):
 		red_ct = red_cts[perm_idx]
 		odds_of_perm =  r**red_ct * (1-r)**(n-2-red_ct)
 		q_assignments = generate_all_q_assignments(q,n,perm)
+		print('Generated Q assignments for permutation ' + str(perm_idx+1) + ' of ' + str(perm_len) + ' in Q=' + str(q))
 		across_all_q_asgs = 0
 		for q_asg_idx in range(len(q_assignments)):
+			'''
+				We now have a particular Q-assignment ex:(R0:Q,B0:Q,R1:NQ,B2:Q,B3:NQ,R4:NQ,B5:Q) for our given permutation ex:(R0,B0,R1,B2,B3,R4,B5).
+
+				We use generate_event_series to generate a set of all possible event series 
+				ex: {[(R0:B0,B0:R0,R1:R0,B2:R1,B3:B0,R4:R0,B5:B0),(R0:B0,B0:R0,R1:R0,B2:R0,B3:B2,R4:R1,B5:B2),]...}
+				that satisfy our particular Q-assignment.
+
+				Then we get the probability of each event series in our set occuring to form G, and sum them, to get the overall probability of our Q-assignment.
+				We add this to our across_all_q_asgs counter that is added to as we loop across all possible Q-assignments for our given permutation.
+
+				Then, once this counter contains the sum of the possiblity of all Q-assignments for our permutation, we weight this value by the probability of
+				the permutation occuring at all, and it add it to our across_all_perms counter.
+
+				This across_all_perms eventually sums across all permutations of possibilities for G, and returns it as the overall possiblity of there being
+				q nodes out of the n being Q-nodes following graph creation (guaranteed to turn red after 1 iteration). The probability of a random node being a Q-node
+				is computed by summing over the probability of all possible q values times their q/n.
+
+			'''
 			possible_events = generate_event_series(q_assignments[q_asg_idx],a_u)
 			across_all_q_asgs += np.sum([events_probability(possible_event, r, p) for possible_event in possible_events])
 		across_all_perms += odds_of_perm * across_all_q_asgs
 	return across_all_perms
 
 def generate_event_series(q_asg, a_u):
-	pass
+	nodes = list(q_asg.keys())
+	assignment_template = [('R0','B0'),('B0','R0')]
+	rest_to_assign_nodes = nodes[2:]
+	for node in rest_to_assign_nodes:
+		unassigned = 'UR' if node[0] == 'R' else 'UB'
+		assignment_template.append((node,unassigned))
+
+	cur_possible_events = [assignment_template]
+
+	'''
+	on iter accept all possible lists. for each list, check if you have been assigned.
+	if not, generate possibilities by assigning 1 earlier node. then try, assigning later nodes,
+	by iterating  through 0 - remaining possible new neighbors, and appropriate alpha number of red node assignments.
+	return these
+	'''
+	for i in range(len(nodes)):
+		cur_possible_events = generate_event_step(cur_possible_events, q_asg, a_u, 
+			index, nodes)
+
+	return cur_possible_events
+
+def generate_event_step(cur_possible_events, q_asg, a_u, index, nodes):
+	new_events = []
+	N = len(nodes)
+	for cur_event in cur_possible_events:
+		options = []
+
+		init_color = None
+		past_color_options = None
+		if(cur_event[index][1] in ['UR','UB']):
+			init_color = ['R','B']
+			past_color_options = [[node for node in nodes[:index] if node[0] == 'R'], [node for node in nodes[:index] if node[0] == 'B']]
+
+		if(init_color is None):
+
+		else:
+
+		
+		for option in options:
+			new_events += generate_event_permutations(option['event'], option['init_color'], option['past_color_options'], 
+				option['num_red'], option['red_options'], option['num_blue'], option['blue_options'])
+
+	return new_events
+
+def generate_event_permutations(event,past_color, past_color_options, num_red, red_options, num_blue, blue_options):
+	possiblities = []
+
+	return possiblities
+
+			
 
 def events_probability(event,r,p):
 	pass
@@ -98,6 +167,33 @@ def generate_all_permutations(N,colors):
 		permutes += list(possible_permutes)
 		red_cts += [red_ct] * len(possible_permutes)
 	return permutes, red_cts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
