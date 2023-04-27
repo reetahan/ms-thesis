@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from math import factorial, floor, ceil, cos, sin, acos, sqrt
 from itertools import permutations
+from copy import deepcopy
 
 def main():
 
-	r = 0.8
-	p = 0.8
-	a_u = 0.4
-	N = 10
+	r = 0.6
+	p = 0.6
+	a_u = 0.6
+	N = 5
 	sims = 1000
 
 	empirical_res = np.mean([test_graph_generation(N,r,p,a_u) for i in range(sims)])
@@ -44,12 +45,12 @@ def theory_test(n,r,p,a_u):
 	perm_len = len(perms)
 	print('Generated permutations')
 
-	return np.sum([q/n * prob_q(n,r,p,a_u,q) for q in range(1,n+1)])
+	return np.sum([q/n * prob_q(n,r,p,a_u,q,perms,red_cts,perm_len) for q in range(1,n+1)])
 
 def prob_q(n,r,p,a_u,q,perms,red_cts,perm_len):
 	across_all_perms = 0
 	for perm_idx in range(len(perms)):
-		perm = perms[perm_idx]
+		perm = deepcopy(perms[perm_idx])
 		for i in range(len(perm)):
 			perm[i] = perm[i] + str(i+1)
 		red_ct = red_cts[perm_idx]
@@ -82,6 +83,8 @@ def prob_q(n,r,p,a_u,q,perms,red_cts,perm_len):
 	return across_all_perms
 
 def generate_event_series(q_asg, a_u):
+	print('Q-ASSIGNMENT')
+	print(q_asg)
 	nodes = list(q_asg.keys())
 	assignment_template = [('R0','B0'),('B0','R0')]
 	rest_to_assign_nodes = nodes[2:]
@@ -97,7 +100,8 @@ def generate_event_series(q_asg, a_u):
 	by iterating  through 0 - remaining possible new neighbors, and appropriate alpha number of red node assignments.
 	return these
 	'''
-	for i in range(len(nodes)):
+	for index in range(len(nodes)):
+		print(f'On constraint #{index+1} of {len(nodes)}')
 		cur_possible_events = generate_event_step(cur_possible_events, q_asg, a_u, 
 			index, nodes)
 		if(len(cur_possible_events) == 0):
@@ -106,17 +110,17 @@ def generate_event_series(q_asg, a_u):
 	return cur_possible_events
 
 def generate_event_step(cur_possible_events, q_asg, a_u, index, nodes):
-	q_value = q_asg[cur_event[index][0]]
 	N = len(nodes)
 
 	new_events = []
 	for cur_event in cur_possible_events:
+		q_value = q_asg[cur_event[index][0]]
 		options = []
 		additional = []
 
-		red_choices = [nodes[index+1:][i] for i in range(len(nodes[index+1:])) if (nodes[index+1:][i] == 'R' and cur_event[index+1+i][1] in ['UR','UB'] )]
+		red_choices = [nodes[index+1:][i] for i in range(len(nodes[index+1:])) if (nodes[index+1:][i][0] == 'R' and cur_event[index+1+i][1] in ['UR','UB'] )]
 		total_red_left = len(red_choices)
-		blue_choices = [nodes[index+1:][i] for i in range(len(nodes[index+1:])) if (nodes[index+1:][i] == 'B' and cur_event[index+1+i][1] in ['UR','UB'])]
+		blue_choices = [nodes[index+1:][i] for i in range(len(nodes[index+1:])) if (nodes[index+1:][i][0] == 'B' and cur_event[index+1+i][1] in ['UR','UB'])]
 		total_blue_left = len(blue_choices)
 
 		init_color = None
@@ -125,81 +129,99 @@ def generate_event_step(cur_possible_events, q_asg, a_u, index, nodes):
 			init_color = ['R','B']
 			past_color_options = [[node for node in nodes[:index] if node[0] == 'R'], [node for node in nodes[:index] if node[0] == 'B']]
 
+		print('ADDITIONAL')
 		if(init_color is None):
 			if(cur_event[index][1][0] == 'R'):
 				if(q_value == 'Q'):
-					min_add = 
-					max_add =
-
+					for poss_red_add in range(0,total_red_left + 1):
+						max_poss_blue_add = int((poss_red_add + 1)/a_u) - (poss_red_add + 1)
+						for poss_blue_add in range(0, min(max_poss_blue_add + 1, total_blue_left + 1)):
+							additional.append((poss_red_add,poss_blue_add))
 					for pair in additional:
 						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
-						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 						options.append(option)
+					print(additional)
 				else:
-					min_add = 
-					max_add =
-
+					for poss_blue_add in range(0,total_blue_left + 1):
+						max_poss_red_add = int(poss_blue_add/a_u) - poss_blue_add - 1
+						for poss_red_add in range(0, min(max_poss_red_add + 1, total_red_left + 1)):
+							additional.append((poss_red_add,poss_blue_add))
 					for pair in additional:
 						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
-						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 						options.append(option)
+					print(additional)
 			else:
 				if(q_value == 'Q'):
-					min_add = 
-					max_add =
-
+					for poss_red_add in range(0,total_red_left + 1):
+						max_poss_blue_add = int(poss_red_add/a_u) - poss_red_add - 1
+						for poss_blue_add in range(0, min(max_poss_blue_add + 1, total_blue_left + 1)):
+							additional.append((poss_red_add,poss_blue_add))
 					for pair in additional:
 						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
-						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 						options.append(option)
+					print(additional)
 				else:
-					min_add = 
-					max_add =
-
+					for poss_blue_add in range(0,total_blue_left + 1):
+						max_poss_red_add = int((poss_blue_add + 1)/a_u) - (poss_blue_add + 1)
+						for poss_red_add in range(0, min(max_poss_red_add + 1, total_red_left + 1)):
+							additional.append((poss_red_add,poss_blue_add))
 					for pair in additional:
 						option = {'event': cur_event, 'init_color': None, 'past_color_options': None, 'num_red': pair[0], \
-						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+						'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 						options.append(option)
+					print(additional)
 
 		else:
 			if(q_value == 'Q'):
-				min_add = 
-				max_add =
-
+				for poss_red_add in range(0,total_red_left + 1):
+					max_poss_blue_add = int((poss_red_add + 1)/a_u) - (poss_red_add + 1)
+					for poss_blue_add in range(0, min(max_poss_blue_add + 1, total_blue_left + 1)):
+						additional.append((poss_red_add,poss_blue_add))
 				for pair in additional:
 					option = {'event': cur_event, 'init_color': init_color[0], 'past_color_options': past_color_options[0], \
-					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 					options.append(option)
 
 				additional = []
 
-				min_add = 
-				max_add =
-
+				for poss_red_add in range(0,total_red_left + 1):
+					max_poss_blue_add = int(poss_red_add/a_u) - poss_red_add - 1
+					for poss_blue_add in range(0, min(max_poss_blue_add + 1, total_blue_left + 1)):
+						additional.append((poss_red_add,poss_blue_add))
 				for pair in additional:
 					option = {'event': cur_event, 'init_color': init_color[1], 'past_color_options': past_color_options[1], \
-					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 					options.append(option)
+				print(additional)
 			else:
-				min_add = 
-				max_add =
-
+				for poss_blue_add in range(0,total_blue_left + 1):
+					max_poss_red_add = int(poss_blue_add/a_u) - poss_blue_add - 1
+					for poss_red_add in range(0, min(max_poss_red_add + 1, total_red_left + 1)):
+						additional.append((poss_red_add,poss_blue_add))
 				for pair in additional:
 					option = {'event': cur_event, 'init_color': init_color[0], 'past_color_options': past_color_options[0], \
-					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 					options.append(option)
 
 				additional = []
 
-				min_add = 
-				max_add =
-
+				for poss_blue_add in range(0,total_blue_left):
+					max_poss_red_add = int((poss_blue_add + 1)/a_u) - (poss_blue_add + 1)
+					for poss_red_add in range(0, min(max_poss_red_add + 1, total_red_left + 1)):
+						additional.append((poss_red_add,poss_blue_add))
 				for pair in additional:
 					option = {'event': cur_event, 'init_color': init_color[1], 'past_color_options': past_color_options[1], \
-					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_options}
+					'num_red': pair[0], 'red_options':red_choices, 'num_blue': pair[1], 'blue_options': blue_choices}
 					options.append(option)
 
-		
+				print(additional)
+
+		print('TOTAL OPTION LIST for ' + str(cur_event))
+		print(options)
+
 		for option in options:
 			new_events += generate_event_permutations(option)
 
@@ -207,6 +229,13 @@ def generate_event_step(cur_possible_events, q_asg, a_u, index, nodes):
 
 def generate_event_permutations(option):
 	possiblities = []
+	red_combos = []
+	blue_combos = []
+
+	if(option['init_color'] is None):
+
+	else:
+		past_combos = options['red_options'] + options['blue_options']
 
 	return possiblities
 
@@ -230,7 +259,6 @@ def generate_all_q_assignments(q,n,perm):
 	l4_ =  ['Q' for i in range(q-1)] + ['NQ' for i in range(n-2-q+1)]
 	final_l4 = [list(l4_base + x) for x in set(permutations(l4_))]
 	final = final_l1 + final_l2 + final_l3 + final_l4
-
 	perm = base + perm
 	poss_assignments = [dict(zip(perm,q_asg)) for q_asg in final]
 
